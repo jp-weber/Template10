@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Controls;
 using NavigationView = Microsoft.UI.Xaml.Controls.NavigationView;
 using NavigationViewItem = Microsoft.UI.Xaml.Controls.NavigationViewItem;
 using NavigationViewItemInvokedEventArgs = Microsoft.UI.Xaml.Controls.NavigationViewItemInvokedEventArgs;
+using Prism.Ioc;
+using Prism;
 
 namespace Template10.Controls
 {
@@ -20,6 +22,7 @@ namespace Template10.Controls
     {
         private CoreDispatcher _dispatcher;
         private Frame _frame;
+        public NavigationService NavigationService { get; private set; }
 
         public NavViewEx()
         {
@@ -39,33 +42,43 @@ namespace Template10.Controls
                 if (TryFindItem(e.SourcePageType, e.Parameter, out var item))
                 {
                     SetSelectedItem(item, false);
+                    if (item == null)
+                    {
+                        return;
+                    }
+                    var navitem = SelectedItem as NavigationViewItem;
+                    Header = navitem.Content;
                 }
             };
 
-            NavigationService = (IPlatformNavigationService)Prism.Navigation.NavigationService
-                .Create(_frame, Gesture.Back, Gesture.Forward, Gesture.Refresh);
-
+            NavigationService = (NavigationService)PrismApplicationBase.Current.Container.Resolve<IPlatformNavigationService>("navigationService", (typeof(Frame), _frame));
 
             ItemInvoked += (s, e) =>
             {
                 SelectedItem = (e.IsSettingsInvoked) ? SettingsItem : Find(e.InvokedItem.ToString());
+                if (SelectedItem == null)
+                {
+                    return;
+                }
+                var item = SelectedItem as NavigationViewItem;
+                Header = item.Content;
             };
 
-            RegisterPropertyChangedCallback(IsPaneOpenProperty, (s, e) =>
-            {
-                UpdatePaneHeadersVisibility();
-            });
+            //RegisterPropertyChangedCallback(IsPaneOpenProperty, (s, e) =>
+            //{
+            //    UpdatePaneHeadersVisibility();
+            //});
 
-            Window.Current.CoreWindow.SizeChanged += (s, e) =>
-            {
-                UpdatePageHeaderContent();
-            };
+            //Window.Current.CoreWindow.SizeChanged += (s, e) =>
+            //{
+            //    UpdatePageHeaderContent();
+            //};
 
-            Loaded += (s, e) =>
-            {
-                UpdatePaneHeadersVisibility();
-                UpdatePageHeaderContent();
-            };
+            //Loaded += (s, e) =>
+            //{
+            //    UpdatePaneHeadersVisibility();
+            //    UpdatePageHeaderContent();
+            //};
         }
 
         private void UpdatePaneHeadersVisibility()
@@ -150,8 +163,6 @@ namespace Template10.Controls
                 _updatePageHeaderSemaphore.Release();
             }
         }
-
-        public IPlatformNavigationService NavigationService { get; private set; }
 
 
         public enum ItemHeaderBehaviors { Hide, Remove, None }

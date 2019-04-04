@@ -195,7 +195,7 @@
       <Version>24.0.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.1.7</Version>
+      <Version>6.2.8</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
       <Version>2.0.0</Version>
@@ -204,18 +204,10 @@
       <Version>11.0.2</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>7.1.0.123-pre</Version>
+      <Version>7.2.0.1038-pre</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\Prism.Unity.Windows\Prism.Unity.Windows.csproj">
-      <Project>{cc3018eb-6d2b-4306-94a1-3a7cba7a8f18}</Project>
-      <Name>Prism.Unity.Windows</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Source\Prism.Windows\Prism.Windows.csproj">
-      <Project>{648C8631-C97F-4B81-98FC-F4370317751A}</Project>
-      <Name>Prism.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Source\Template10.Extras.10586\Template10.Extras.15063.csproj">
       <Project>{9bb18d4b-bcdd-43c9-a7c2-416d13dd39a6}</Project>
       <Name>Template10.Extras.15063</Name>

@@ -1,15 +1,11 @@
-﻿
-using Prism.Events;
-using Prism.Ioc;
-using Prism.Logging;
-using Prism.Navigation;
+﻿using Prism.Ioc;
 using Unity;
 
 namespace Prism.Unity
 {
     public abstract class PrismApplication : PrismApplicationBase
     {
-        public sealed override IContainerExtension CreateContainer()
+        protected override IContainerExtension CreateContainerExtension()
         {
             return new UnityContainerExtension(new UnityContainer());
         }

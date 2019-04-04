@@ -1,7 +1,4 @@
-﻿using Prism.Utilities;
-using System;
-using System.Linq;
-using System.Reflection;
+﻿using Windows.ApplicationModel;
 using Windows.UI.Xaml;
 
 namespace Prism.Mvvm
@@ -21,7 +18,7 @@ namespace Prism.Mvvm
                 typeof(ViewModelLocator), new PropertyMetadata(null, AutowireViewModelChanged));
         private static void AutowireViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!Windows.ApplicationModel.DesignMode.DesignModeEnabled)
+            if (!DesignMode.DesignModeEnabled)
             {
                 if (((bool?)e.NewValue) == true)
                 {
