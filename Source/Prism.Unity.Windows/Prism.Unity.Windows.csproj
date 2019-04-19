@@ -120,7 +120,7 @@
       <Version>7.2.0.1156-ci</Version>
     </PackageReference>
     <PackageReference Include="Unity">
-      <Version>5.10.2</Version>
+      <Version>5.10.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
