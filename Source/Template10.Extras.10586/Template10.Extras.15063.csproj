@@ -186,10 +186,10 @@
       <Version>6.2.8</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
-      <Version>2.0.0</Version>
+      <Version>2.0.1</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>7.2.0.1156-ci</Version>
+      <Version>7.2.0.1175-ci</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
