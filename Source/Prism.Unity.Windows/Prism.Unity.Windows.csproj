@@ -11,7 +11,7 @@
     <AssemblyName>Prism.Unity.Windows</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.18362.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -117,7 +117,7 @@
       <Version>6.2.8</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>7.2.0.1175-ci</Version>
+      <Version>7.2.0.1233-pre</Version>
     </PackageReference>
     <PackageReference Include="Unity">
       <Version>5.10.3</Version>

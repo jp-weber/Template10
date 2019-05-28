@@ -189,7 +189,7 @@
       <Version>2.0.1</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>7.2.0.1175-ci</Version>
+      <Version>7.2.0.1233-pre</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

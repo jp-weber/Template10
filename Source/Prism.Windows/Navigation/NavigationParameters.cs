@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.Foundation;
+using win = Windows.Foundation;
 
 namespace Prism.Navigation
 {
@@ -23,7 +23,7 @@ namespace Prism.Navigation
         }
 
         public NavigationParameters(string query)
-            : this(string.IsNullOrWhiteSpace(query) ? Array.Empty<ValueTuple<string, object>>() : new WwwFormUrlDecoder(query).Select(x => ValueTuple.Create(x.Name, (object)x.Value)).ToArray())
+            : this(string.IsNullOrWhiteSpace(query) ? Array.Empty<(string key, object value)>() : new win.WwwFormUrlDecoder(query).Select(x => (x.Name, (object)x.Value)).ToArray())
         {
             // empty
         }
