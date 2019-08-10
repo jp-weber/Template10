@@ -117,10 +117,10 @@
       <Version>6.2.8</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>7.2.0.1233-pre</Version>
+      <Version>7.2.0.1367</Version>
     </PackageReference>
-    <PackageReference Include="Unity">
-      <Version>5.10.3</Version>
+    <PackageReference Include="Unity.Container">
+      <Version>5.11.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
