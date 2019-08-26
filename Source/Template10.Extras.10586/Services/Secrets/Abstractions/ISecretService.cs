@@ -3,5 +3,7 @@
     public interface ISecretService
     {
         string ConnectionString { get; set; }
+
+        SecretHelper Helper { get; }
     }
 }

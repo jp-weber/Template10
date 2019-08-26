@@ -16,34 +16,37 @@ namespace Template10.Services.File
         /// <summary>Returns if a file is found in the specified storage strategy</summary>
         /// <param name="key">Path of the file in storage</param>
         /// <param name="location">Location storage strategy</param>
+        /// <param name="path">Custom path for storage</param>
         /// <returns>Boolean: true if found, false if not found</returns>
-        public async Task<bool> FileExistsAsync(string key, StorageStrategies location = StorageStrategies.Local)
-            => (await GetIfFileExistsAsync(key, location)) != null;
+        public async Task<bool> FileExistsAsync(string key, StorageStrategies location = StorageStrategies.Local, string path = null)
+            => (await GetIfFileExistsAsync(key, location, path)) != null;
 
         public async Task<bool> FileExistsAsync(string key, StorageFolder folder) => (await GetIfFileExistsAsync(key, folder)) != null;
 
         /// <summary>Deletes a file in the specified storage strategy</summary>
         /// <param name="key">Path of the file in storage</param>
         /// <param name="location">Location storage strategy</param>
-        public async Task<bool> DeleteFileAsync(string key, StorageStrategies location = StorageStrategies.Local)
+        /// <param name="path">Custom path for storage</param>
+        public async Task<bool> DeleteFileAsync(string key, StorageStrategies location = StorageStrategies.Local, string path = null)
         {
-            var file = await GetIfFileExistsAsync(key, location);
+            var file = await GetIfFileExistsAsync(key, location, path);
             if (file != null)
                 await file.DeleteAsync();
-            return !(await FileExistsAsync(key, location));
+            return !(await FileExistsAsync(key, location, path));
         }
 
         /// <summary>Reads and deserializes a file into specified type T</summary>
         /// <typeparam name="T">Specified type into which to deserialize file content</typeparam>
         /// <param name="key">Path to the file in storage</param>
         /// <param name="location">Location storage strategy</param>
+        /// <param name="path">Custom path for storage</param>
         /// <returns>Specified type T</returns>
-        public async Task<T> ReadFileAsync<T>(string key, StorageStrategies location = StorageStrategies.Local)
+        public async Task<T> ReadFileAsync<T>(string key, StorageStrategies location = StorageStrategies.Local, string path = null)
         {
             try
             {
                 // fetch file
-                var file = await GetIfFileExistsAsync(key, location);
+                var file = await GetIfFileExistsAsync(key, location, path);
                 if (file == null)
                     return default(T);
                 // read content
@@ -58,12 +61,12 @@ namespace Template10.Services.File
             }
         }
 
-        public async Task<string> ReadStringAsync(string key, StorageStrategies location = StorageStrategies.Local)
+        public async Task<string> ReadStringAsync(string key, StorageStrategies location = StorageStrategies.Local, string path = null)
         {
             try
             {
                 // fetch file
-                var file = await GetIfFileExistsAsync(key, location);
+                var file = await GetIfFileExistsAsync(key, location, path);
                 if (file == null)
                     return string.Empty;
                 // read content
@@ -80,11 +83,12 @@ namespace Template10.Services.File
         /// <param name="key">Path to the file in storage</param>
         /// <param name="value">Instance of object to be serialized and written</param>
         /// <param name="location">Location storage strategy</param>
+        /// <param name="path">Custom path for storage</param>
         public async Task<bool> WriteFileAsync<T>(string key, T value, StorageStrategies location = StorageStrategies.Local,
-            CreationCollisionOption option = CreationCollisionOption.ReplaceExisting)
+            CreationCollisionOption option = CreationCollisionOption.ReplaceExisting, string path = null)
         {
             // create file
-            var file = await CreateFileAsync(key, location, option);
+            var file = await CreateFileAsync(key, location, option, path);
             // convert to string
             var serializedValue = Serialize(value);
             // save string to file
@@ -94,10 +98,10 @@ namespace Template10.Services.File
         }
 
         public async Task<bool> WriteStringAsync(string key, string value, StorageStrategies location = StorageStrategies.Local,
-            CreationCollisionOption option = CreationCollisionOption.ReplaceExisting)
+            CreationCollisionOption option = CreationCollisionOption.ReplaceExisting, string path = null)
         {
             // create file
-            var file = await CreateFileAsync(key, location, option);
+            var file = await CreateFileAsync(key, location, option, path);
             // save string to file
             await FileIO.WriteTextAsync(file, value);
             // result
@@ -105,7 +109,7 @@ namespace Template10.Services.File
         }
 
         private async Task<StorageFile> CreateFileAsync(string key, StorageStrategies location = StorageStrategies.Local,
-            CreationCollisionOption option = CreationCollisionOption.OpenIfExists)
+            CreationCollisionOption option = CreationCollisionOption.OpenIfExists, string path = null)
         {
             switch (location)
             {
@@ -115,6 +119,8 @@ namespace Template10.Services.File
                     return await ApplicationData.Current.RoamingFolder.CreateFileAsync(key, option);
                 case StorageStrategies.Temporary:
                     return await ApplicationData.Current.TemporaryFolder.CreateFileAsync(key, option);
+                case StorageStrategies.Custom:
+                    return await (await StorageFolder.GetFolderFromPathAsync(path)).CreateFileAsync(key, option);
                 default:
                     throw new NotSupportedException(location.ToString());
             }
@@ -138,9 +144,10 @@ namespace Template10.Services.File
         /// <summary>Returns a file if it is found in the specified storage strategy</summary>
         /// <param name="key">Path of the file in storage</param>
         /// <param name="location">Location storage strategy</param>
+        /// <param name="path">Custom path for storage</param>
         /// <returns>StorageFile</returns>
         private async Task<StorageFile> GetIfFileExistsAsync(string key,
-            StorageStrategies location = StorageStrategies.Local)
+            StorageStrategies location = StorageStrategies.Local, string path = null)
         {
             StorageFile retval;
             try
@@ -155,6 +162,9 @@ namespace Template10.Services.File
                         break;
                     case StorageStrategies.Temporary:
                         retval = await ApplicationData.Current.TemporaryFolder.TryGetItemAsync(key) as StorageFile;
+                        break;
+                    case StorageStrategies.Custom:
+                        retval = await (await StorageFolder.GetFolderFromPathAsync(path)).TryGetItemAsync(key) as StorageFile;
                         break;
                     default:
                         throw new NotSupportedException(location.ToString());
