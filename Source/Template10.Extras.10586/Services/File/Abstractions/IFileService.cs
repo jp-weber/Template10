@@ -10,7 +10,11 @@ namespace Template10.Services.File
         Task<bool> FileExistsAsync(string key, StorageFolder folder);
         Task<T> ReadFileAsync<T>(string key, StorageStrategies location = StorageStrategies.Local, string path = null);
         Task<string> ReadStringAsync(string key, StorageStrategies location = StorageStrategies.Local, string path = null);
+
+        Task<string> ReadStringAsync(string key, StorageFolder folder);
         Task<bool> WriteFileAsync<T>(string key, T value, StorageStrategies location = StorageStrategies.Local, CreationCollisionOption option = CreationCollisionOption.ReplaceExisting, string path = null);
         Task<bool> WriteStringAsync(string key, string value, StorageStrategies location = StorageStrategies.Local, CreationCollisionOption option = CreationCollisionOption.ReplaceExisting, string path = null);
+
+        Task<bool> WriteStringAsync(string key, string value, StorageFolder folder);
     }
 }
