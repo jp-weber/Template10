@@ -136,6 +136,7 @@ namespace Template10.Services.File
             return await FileExistsAsync(key, folder);
         }
 
+
         private async Task<StorageFile> CreateFileAsync(string key, StorageStrategies location = StorageStrategies.Local,
             CreationCollisionOption option = CreationCollisionOption.OpenIfExists, string path = null)
         {
@@ -148,7 +149,8 @@ namespace Template10.Services.File
                 case StorageStrategies.Temporary:
                     return await ApplicationData.Current.TemporaryFolder.CreateFileAsync(key, option);
                 case StorageStrategies.Custom:
-                    return await (await StorageFolder.GetFolderFromPathAsync(path)).CreateFileAsync(key, option);
+                    //only using, if a filepicker is used. In other case, use CreateFileAsync(string key, StorageFolder folder,...)
+                    return await StorageFile.GetFileFromPathAsync(path + key);
                 default:
                     throw new NotSupportedException(location.ToString());
             }
