@@ -46,8 +46,6 @@ namespace Template10.Controls
                     {
                         return;
                     }
-                    var navitem = SelectedItem as NavigationViewItem;
-                    Header = navitem.Content;
                 }
             };
 
@@ -55,7 +53,7 @@ namespace Template10.Controls
 
             ItemInvoked += (s, e) =>
             {
-                SelectedItem = (e.IsSettingsInvoked) ? SettingsItem : Find(e.InvokedItem.ToString());
+                SelectedItem = (e.IsSettingsInvoked) ? SettingsItem : Find(e.InvokedItemContainer as NavigationViewItem);
                 if (SelectedItem == null)
                 {
                     return;
@@ -196,31 +194,47 @@ namespace Template10.Controls
             {
                 if (SettingsNavigationUri != null)
                 {
-                    await NavigationService.NavigateAsync(SettingsNavigationUri);
-                    PreviousItem = selectedItem;
-                    base.SelectedItem = selectedItem;
+                    if (withNavigation)
+                    {
+                        if ((await NavigationService.NavigateAsync(SettingsNavigationUri)).Success)
+                        {
+                            PreviousItem = selectedItem;
+                            base.SelectedItem = selectedItem;
+                            SettingsInvoked?.Invoke(this, EventArgs.Empty);
+                        }
+                        else
+                        {
+                            base.SelectedItem = null;
+                        }
+                    }
+                    else
+                    {
+                        PreviousItem = selectedItem;
+                        base.SelectedItem = selectedItem;
+                    }
+
+
                 }
-                SettingsInvoked?.Invoke(this, EventArgs.Empty);
             }
             else if (selectedItem is NavigationViewItem item)
             {
                 if (item.GetValue(NavViewProps.NavigationUriProperty) is string path)
                 {
-			if (!withNavigation)
-			{
-				PreviousItem = item;
-				base.SelectedItem = item;
-			}
-			else if ((await NavigationService.NavigateAsync(path)).Success)
-			{
-				PreviousItem = selectedItem;
-				base.SelectedItem = selectedItem;
-			}
-			else
-			{
-				base.SelectedItem = PreviousItem;
-				Debug.WriteLine($"{selectedItem}.{nameof(NavViewProps.NavigationUriProperty)} navigation failed.");
-			}
+			        if (!withNavigation)
+			        {
+				        PreviousItem = item;
+				        base.SelectedItem = item;
+			        }
+			        else if ((await NavigationService.NavigateAsync(path)).Success)
+			        {
+				        PreviousItem = selectedItem;
+				        base.SelectedItem = selectedItem;
+			        }
+			        else
+			        {
+				        base.SelectedItem = PreviousItem;
+				        Debug.WriteLine($"{selectedItem}.{nameof(NavViewProps.NavigationUriProperty)} navigation failed.");
+			        }
                 }
                 else
                 {
@@ -283,9 +297,10 @@ namespace Template10.Controls
             return false;
         }
 
-        private NavigationViewItem Find(string content)
+        private NavigationViewItem Find(NavigationViewItem item)
         {
-            return this.MenuItems.OfType<NavigationViewItem>().SingleOrDefault(x => x.Content.Equals(content));
+            return this.MenuItems.OfType<NavigationViewItem>().SingleOrDefault(x => x.Equals(item));
+            //return this.MenuItems.OfType<NavigationViewItem>().SingleOrDefault(x => x.Content.Equals(content));
         }
     }
 }
