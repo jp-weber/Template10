@@ -116,7 +116,7 @@
       <Version>6.2.9</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.3.191007001-prerelease</Version>
+      <Version>2.3.191107001-prerelease</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
       <Version>7.2.0.1367</Version>
