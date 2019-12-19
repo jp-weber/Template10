@@ -12,7 +12,7 @@ namespace Template10.Services.File
         /// <returns>Boolean: true if deleted, false if not deleted</returns>
         Task<bool> DeleteFileAsync(string key, StorageStrategies location = StorageStrategies.Local, string path = null);
 
-        /// <summary>Deletes a file in the specified storage strategy</summary>
+        /// <summary>Deletes a file in the specified folder/summary>
         /// <param name="key">Path of the file in storage</param>
         /// <param name="folder">Parent folder of the file. Only accessible if rights have been granted</param>
         /// <returns>Boolean: true if deleted, false if not deleted</returns>
@@ -25,7 +25,7 @@ namespace Template10.Services.File
         /// <returns>Boolean: true if found, false if not found</returns>
         Task<bool> FileExistsAsync(string key, StorageStrategies location = StorageStrategies.Local, string path = null);
 
-        /// <summary>Returns if a file is found in the specified storage strategy</summary>
+        /// <summary>Returns if a file is found in the specified folder</summary>
         /// <param name="key">Path of the file in storage</param>
         /// <param name="folder">Parent folder of the file. Only accessible if rights have been granted</param>
         /// <returns>Boolean: true if found, false if not found</returns>
@@ -60,12 +60,32 @@ namespace Template10.Services.File
         Task<string> ReadStringAsync(string key, StorageFolder folder);
 
 
+        /// <summary>Serializes an object and write to file in specified storage strategy</summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">Path to the file in storage</param>
+        /// <param name="value">Instance of object to be serialized and written</param>
+        /// <param name="location">Location storage strategy</param>
+        /// <param name="option">defines the collision handling</param>
+        /// <param name="path">Custom path for storage. Only accessible if rights have been granted</param>
+        /// <returns></returns>
         Task<bool> WriteFileAsync<T>(string key, T value, StorageStrategies location = StorageStrategies.Local, CreationCollisionOption option = CreationCollisionOption.ReplaceExisting, string path = null);
 
+
+        /// <summary>Serializes an object and write to file in specified storage strategy</summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">Path to the file in storage</param>
+        /// <param name="value">Instance of object to be serialized and written</param>
+        /// <param name="folder">Parent folder of the file. Only accessible if rights have been granted</param>
+        /// <returns></returns>
         Task<bool> WriteFileAsync<T>(string key, T value, StorageFolder folder);
 
-        Task<bool> WriteStringAsync(string key, string value, StorageStrategies location = StorageStrategies.Local, CreationCollisionOption option = CreationCollisionOption.ReplaceExisting, string path = null);
 
-        Task<bool> WriteStringAsync<T>(string key, string value, StorageFolder folder);
+        /// <summary>Write string to file in specified storage strategy</summary>
+        /// <param name="key">Path to the file in storage</param>
+        /// <param name="value">Instance of object to be serialized and written</param>
+        /// <param name="option">defines the collision handling</param>
+        /// <param name="path">Custom path for storage. Only accessible if rights have been granted</param>
+        /// <returns></returns>
+        Task<bool> WriteStringAsync(string key, string value, StorageStrategies location = StorageStrategies.Local, CreationCollisionOption option = CreationCollisionOption.ReplaceExisting, string path = null);
     }
 }
