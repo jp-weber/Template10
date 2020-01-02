@@ -54,12 +54,12 @@ namespace Template10.Controls
             ItemInvoked += (s, e) =>
             {
                 SelectedItem = (e.IsSettingsInvoked) ? SettingsItem : Find(e.InvokedItemContainer as NavigationViewItem);
-                if (SelectedItem == null)
-                {
-                    return;
-                }
-                var item = SelectedItem as NavigationViewItem;
-                Header = item.Content;
+                //if (SelectedItem == null)
+                //{
+                //    return;
+                //}
+                //var item = SelectedItem as NavigationViewItem;
+                //Header = item.Content;
             };
 
             //RegisterPropertyChangedCallback(IsPaneOpenProperty, (s, e) =>
