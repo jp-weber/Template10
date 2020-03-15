@@ -1,4 +1,4 @@
-﻿namespace Prism.Navigation
+﻿namespace Template10.Navigation
 {
     public static class NavigationParametersExtensions
     {
@@ -7,5 +7,4 @@
             (nav as NavigationParameters)._internal.Remove(key);
         }
     }
-
 }

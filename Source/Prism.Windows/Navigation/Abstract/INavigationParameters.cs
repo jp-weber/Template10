@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
     public interface INavigationParameters : IEnumerable<KeyValuePair<string, object>>
     {

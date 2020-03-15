@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
     internal static partial class FrameFacadeExtensions
     {

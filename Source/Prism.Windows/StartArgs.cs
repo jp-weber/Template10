@@ -1,8 +1,40 @@
-﻿using Windows.ApplicationModel.Activation;
-
+﻿using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
+using Windows.UI.Core;
+using Windows.UI.Core.Preview;
 
 namespace Prism
 {
+    public enum StopKind
+    {
+        Suspending,
+        CloseRequested,
+        CoreWindowClosed,
+        CoreApplicationExiting
+    }
+
+    public interface IStopArgs
+    {
+        StopKind StopKind { get; }
+        SuspendingEventArgs SuspendingEventArgs { get; }
+        SystemNavigationCloseRequestedPreviewEventArgs CloseRequestedPreviewEventArgs { get; }
+        CoreWindowEventArgs CoreWindowEventArgs { get; }
+        object CoreApplicationEventArgs { get; }
+    }
+
+    public class StopArgs : IStopArgs
+    {
+        public StopArgs(StopKind kind)
+        {
+            StopKind = kind;
+        }
+        public StopKind StopKind { get; }
+        public SuspendingEventArgs SuspendingEventArgs { get; internal set; }
+        public SystemNavigationCloseRequestedPreviewEventArgs CloseRequestedPreviewEventArgs { get; internal set; }
+        public CoreWindowEventArgs CoreWindowEventArgs { get; internal set; }
+        public object CoreApplicationEventArgs { get; internal set; }
+    }
+
     public class StartArgs : IStartArgs
     {
         public StartArgs(IActivatedEventArgs args, StartKinds startKind)

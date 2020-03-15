@@ -2,11 +2,11 @@
 using System.Reflection;
 using Windows.UI.Xaml.Controls;
 
-namespace Prism.Utilities
+namespace Prism
 {
     public static class BindingUtilities
     {
-        public static void UpdateBindings(Page page)
+        public static void UpdateBindings(this Page page)
         {
             if (page == null)
             {
@@ -18,7 +18,7 @@ namespace Prism.Utilities
             update?.Invoke(bindings, null);
         }
 
-        public static void InitializeBindings(Page page)
+        public static void InitializeBindings(this Page page)
         {
             if (page == null)
             {
@@ -30,7 +30,7 @@ namespace Prism.Utilities
             update?.Invoke(bindings, null);
         }
 
-        public static void StopTrackingBindings(Page page)
+        public static void StopTrackingBindings(this Page page)
         {
             if (page == null)
             {

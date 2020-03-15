@@ -30,11 +30,11 @@ namespace Prism
             add { _leavingBackground += value; }
             remove { _leavingBackground -= value; }
         }
-        TypedEventHandler<PrismApplicationBase, WindowCreatedEventArgs> _windowCreated;
-        event TypedEventHandler<PrismApplicationBase, WindowCreatedEventArgs> IPrismApplicationEvents.WindowCreated
-        {
-            add { _windowCreated += value; }
-            remove { _windowCreated -= value; }
-        }
+        //TypedEventHandler<PrismApplicationBase, WindowCreatedEventArgs> _windowCreated;
+        //event TypedEventHandler<PrismApplicationBase, WindowCreatedEventArgs> IPrismApplicationEvents.WindowCreated
+        //{
+        //    add { _windowCreated += value; }
+        //    remove { _windowCreated -= value; }
+        //}
     }
 }

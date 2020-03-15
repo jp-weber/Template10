@@ -2,7 +2,7 @@
 using System.Linq;
 using Windows.Foundation;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
     public class NavigationPath : INavigationPath
     {

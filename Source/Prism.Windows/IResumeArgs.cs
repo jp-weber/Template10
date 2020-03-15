@@ -7,6 +7,6 @@ namespace Prism
     {
         ApplicationExecutionState PreviousExecutionState { get; set; }
         ActivationKind Kind { get; set; }
-        DateTime SuspensionDate { get; set; }
+        DateTime? SuspendDate { get; set; }
     }
 }

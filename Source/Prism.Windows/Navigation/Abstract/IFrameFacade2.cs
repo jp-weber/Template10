@@ -1,8 +1,8 @@
 ﻿using Windows.UI.Xaml.Controls;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
-    public interface IFrameProvider
+    public interface IFrameFacade2
     {
         Frame Frame { get; }
     }

@@ -2,12 +2,12 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
     /// <summary>
     /// Provides page based navigation for ViewModels.
     /// </summary>
-    public interface INavigationService
+    public interface INavigationServiceX // delete me
     {
         /// <summary>
         /// Navigates to the most recent entry in the back navigation history by popping the calling Page off the navigation stack.
