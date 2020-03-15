@@ -1,28 +1,31 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Prism;
+using Prism.Ioc;
 using Prism.Logging;
-using Prism.Utilities;
+using Prism.Mvvm;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
-    public class FrameFacade : IFrameFacade, IFrameProvider
+    public class FrameFacade : IFrameFacade, IFrameFacade2
     {
-        private readonly bool _logStartingEvents = false;
+        private readonly bool _logStartingEvents = true;
 
         private readonly Frame _frame;
         private readonly CoreDispatcher _dispatcher;
         private readonly SynchronizationContext _syncContext;
+        private readonly INavigationService _navigationService;
         private readonly ILoggerFacade _logger;
 
         public event EventHandler CanGoBackChanged;
         public event EventHandler CanGoForwardChanged;
 
-        public FrameFacade(Frame frame, ILoggerFacade logger)
+        internal FrameFacade(Frame frame, INavigationService navigationService, string id)
         {
             _frame = frame;
             _frame.ContentTransitions = new TransitionCollection
@@ -36,17 +39,34 @@ namespace Prism.Navigation
 
             _dispatcher = frame.Dispatcher;
             _syncContext = SynchronizationContext.Current;
-            _logger = logger;
+            _navigationService = navigationService;
+            _logger = PrismApplicationBase.Current.Container.Resolve<ILoggerFacade>();
+
+            if (id != null)
+            {
+                Id = id;
+            }
         }
 
-        Frame IFrameProvider.Frame
-            => _frame;
+        Frame IFrameFacade2.Frame
+        {
+            get
+            {
+                return _frame;
+            }
+        }
 
         public bool CanGoBack()
-            => _frame.CanGoBack;
+        {
+            return _frame.CanGoBack;
+        }
 
         public bool CanGoForward()
-            => _frame.CanGoForward;
+        {
+            return _frame.CanGoForward;
+        }
+
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public async Task<INavigationResult> GoBackAsync(INavigationParameters parameters,
             NavigationTransitionInfo infoOverride)
@@ -112,7 +132,7 @@ namespace Prism.Navigation
                 });
         }
 
-        async Task<INavigationResult> NavigateAsync(
+        private async Task<INavigationResult> NavigateAsync(
             string path,
             INavigationParameters parameter,
             NavigationTransitionInfo infoOverride)
@@ -203,7 +223,7 @@ namespace Prism.Navigation
 
         private async Task<INavigationResult> OrchestrateAsync(
             INavigationParameters parameters,
-            Prism.Navigation.NavigationMode mode,
+            NavigationMode mode,
             Func<Task<bool>> navigate)
         {
             // setup default parameters
@@ -253,18 +273,14 @@ namespace Prism.Navigation
             var new_vm = new_page?.DataContext;
             if (new_vm is null)
             {
-                if (Mvvm.ViewModelLocator.GetAutowireViewModel(new_page) is null)
+                if (Prism.Mvvm.ViewModelLocator.GetAutowireViewModel(new_page) is null)
                 {
                     // developer didn't set autowire, and did't set datacontext manually
                     _logger.Log("No view-model is set for target page, we will attempt to find view-model declared using RegisterForNavigation<P, VM>().", Category.Info, Priority.None);
 
                     // set the autowire & see if we can find it for them
-                    Mvvm.ViewModelLocator.SetAutowireViewModel(new_page, true);
-
-                    // TODO: I wonder if I need to delay for a second?
-
+                    ViewModelLocator.SetAutowireViewModel(new_page, true);
                     new_vm = new_page.DataContext;
-
                     if (new_vm != null)
                     {
                         _logger.Log($"View-Model: {new_vm} found for target View: {new_page}.", Category.Info, Priority.None);
@@ -278,6 +294,7 @@ namespace Prism.Navigation
             }
             else
             {
+                SetNavigationServiceOnVm(new_vm);
                 OnNavigatingTo(parameters, new_vm);
                 await OnNavigatedToAsync(parameters, new_vm);
                 OnNavigatedTo(parameters, new_vm);
@@ -285,11 +302,24 @@ namespace Prism.Navigation
 
             // refresh-bindings
 
-            BindingUtilities.UpdateBindings(new_page);
+            new_page.UpdateBindings();
 
             // finally
 
             return this.NavigationSuccess();
+        }
+
+        private void SetNavigationServiceOnVm(object new_vm)
+        {
+            if (_logStartingEvents)
+            {
+                _logger.Log($"STARTING {nameof(SetNavigationServiceOnVm)}", Category.Info, Priority.None);
+            }
+
+            if (new_vm is ViewModelBase vm)
+            {
+                vm.NavigationService = _navigationService;
+            }
         }
 
         private async Task<bool> CanNavigateAsync(INavigationParameters parameters, object vm)
@@ -407,10 +437,11 @@ namespace Prism.Navigation
             }
         }
 
-        private INavigationParameters UpdateInternalParameters(INavigationParameters parameters, Prism.Navigation.NavigationMode mode)
+        private INavigationParameters UpdateInternalParameters(INavigationParameters parameters, NavigationMode mode)
         {
             parameters = parameters ?? new NavigationParameters();
             parameters.SetNavigationMode(mode);
+            parameters.SetNavigationService(_navigationService);
             parameters.SetSyncronizationContext(_syncContext);
             return parameters;
         }
@@ -445,11 +476,6 @@ namespace Prism.Navigation
                     });
                     return result;
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.Log($"Exception in FrameFacade.NavigateFrameAsync() {ex}", Category.Exception, Priority.None);
-                throw new Exception("Exception in FrameFacade.NavigateFrameAsync().", ex);
             }
             finally
             {

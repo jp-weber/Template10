@@ -7,14 +7,12 @@ using Windows.UI.Xaml;
 using System.Collections.ObjectModel;
 using win = Windows;
 using System.Threading;
-using Prism.Utilities;
 using Prism.Services;
 using Windows.UI.Xaml.Controls;
 using NavigationView = Microsoft.UI.Xaml.Controls.NavigationView;
 using NavigationViewItem = Microsoft.UI.Xaml.Controls.NavigationViewItem;
-using NavigationViewItemInvokedEventArgs = Microsoft.UI.Xaml.Controls.NavigationViewItemInvokedEventArgs;
-using Prism.Ioc;
 using Prism;
+using Template10.Navigation;
 
 namespace Template10.Controls
 {
@@ -22,7 +20,7 @@ namespace Template10.Controls
     {
         private CoreDispatcher _dispatcher;
         private Frame _frame;
-        public NavigationService NavigationService { get; private set; }
+        public INavigationService NavigationService { get; private set; }
 
         public NavViewEx()
         {
@@ -49,123 +47,13 @@ namespace Template10.Controls
                 }
             };
 
-            NavigationService = (NavigationService)PrismApplicationBase.Current.Container.Resolve<IPlatformNavigationService>("navigationService", (typeof(Frame), _frame));
+            NavigationService = NavigationFactory.Create(_frame).AttachGestures(Window.Current, Gesture.Back, Gesture.Forward, Gesture.Refresh);
 
             ItemInvoked += (s, e) =>
             {
                 SelectedItem = (e.IsSettingsInvoked) ? SettingsItem : Find(e.InvokedItemContainer as NavigationViewItem);
-                //if (SelectedItem == null)
-                //{
-                //    return;
-                //}
-                //var item = SelectedItem as NavigationViewItem;
-                //Header = item.Content;
             };
-
-            //RegisterPropertyChangedCallback(IsPaneOpenProperty, (s, e) =>
-            //{
-            //    UpdatePaneHeadersVisibility();
-            //});
-
-            //Window.Current.CoreWindow.SizeChanged += (s, e) =>
-            //{
-            //    UpdatePageHeaderContent();
-            //};
-
-            //Loaded += (s, e) =>
-            //{
-            //    UpdatePaneHeadersVisibility();
-            //    UpdatePageHeaderContent();
-            //};
         }
-
-        private void UpdatePaneHeadersVisibility()
-        {
-            foreach (var item in MenuItems.OfType<NavigationViewItemHeader>())
-            {
-                switch (ItemHeaderBehavior)
-                {
-                    case ItemHeaderBehaviors.Hide:
-                        item.Opacity = IsPaneOpen ? 1 : 0;
-                        break;
-                    case ItemHeaderBehaviors.Remove:
-                        item.Visibility = IsPaneOpen ? Visibility.Visible : Visibility.Collapsed;
-                        break;
-                    case ItemHeaderBehaviors.None:
-                        // empty
-                        break;
-                }
-            }
-        }
-
-        private static SemaphoreSlim _updatePageHeaderSemaphore = new SemaphoreSlim(1, 1);
-
-        private void UpdatePageHeaderContent()
-        {
-            _updatePageHeaderSemaphore.Wait();
-
-            bool localTryGetCommandBar(out CommandBar bar)
-            {
-                var children = XamlUtilities.RecurseChildren(this);
-                var bars = children
-                    .OfType<CommandBar>();
-                if (!bars.Any())
-                {
-                    bar = default(CommandBar);
-                    return false;
-                }
-                bar = bars.First();
-                return true;
-            }
-
-            void localUpdatePageHeaderCommands(ObservableCollection<object> headerCommands)
-            {
-                if (!localTryGetCommandBar(out var bar))
-                {
-                    return;
-                }
-
-                var previous = bar.PrimaryCommands
-                    .OfType<DependencyObject>()
-                    .Where(x => x.GetValue(NavViewProps.PageHeaderCommandDynamicItemProperty) is bool value && value);
-
-                foreach (var command in previous.OfType<ICommandBarElement>().ToArray())
-                {
-                    bar.PrimaryCommands.Remove(command);
-                }
-
-                foreach (var command in headerCommands.Reverse().OfType<DependencyObject>().ToArray())
-                {
-                    command.SetValue(NavViewProps.PageHeaderCommandDynamicItemProperty, true);
-                    bar.PrimaryCommands.Insert(0, command as ICommandBarElement);
-                }
-            }
-
-            try
-            {
-                if (_frame.Content is Page page)
-                {
-                    if (page.GetValue(NavViewProps.HeaderTextProperty) is string headerText && !Equals(Header, headerText))
-                    {
-                        Header = headerText;
-                    }
-
-                    if (page.GetValue(NavViewProps.HeaderCommandsProperty) is ObservableCollection<object> headerCommands && headerCommands.Any())
-                    {
-                        localUpdatePageHeaderCommands(headerCommands);
-                    }
-                }
-            }
-            finally
-            {
-                _updatePageHeaderSemaphore.Release();
-            }
-        }
-
-
-        public enum ItemHeaderBehaviors { Hide, Remove, None }
-        public ItemHeaderBehaviors ItemHeaderBehavior { get; set; } = ItemHeaderBehaviors.Remove;
-
         public string SettingsNavigationUri { get; set; }
         public event EventHandler SettingsInvoked;
 

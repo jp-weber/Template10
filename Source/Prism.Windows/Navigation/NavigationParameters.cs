@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using win = Windows.Foundation;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
     public class NavigationParameters : INavigationParameters, INavigationParametersInternal
     {
@@ -23,7 +22,7 @@ namespace Prism.Navigation
         }
 
         public NavigationParameters(string query)
-            : this(string.IsNullOrWhiteSpace(query) ? Array.Empty<(string key, object value)>() : new win.WwwFormUrlDecoder(query).Select(x => (x.Name, (object)x.Value)).ToArray())
+            : this(string.IsNullOrWhiteSpace(query) ? Array.Empty<(string key, object value)>() : new Windows.Foundation.WwwFormUrlDecoder(query).Select(x => (x.Name, (object)x.Value)).ToArray())
         {
             // empty
         }
@@ -35,7 +34,7 @@ namespace Prism.Navigation
             return $"{{internal:{i} external:{e}}}";
         }
 
-        Dictionary<string, object> _external = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _external = new Dictionary<string, object>();
         internal Dictionary<string, object> _internal = new Dictionary<string, object>();
 
         public object this[string key]

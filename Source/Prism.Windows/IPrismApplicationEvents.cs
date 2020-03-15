@@ -7,6 +7,6 @@ namespace Prism
     {
         event EnteredBackgroundEventHandler EnteredBackground;
         event LeavingBackgroundEventHandler LeavingBackground;
-        event TypedEventHandler<PrismApplicationBase, WindowCreatedEventArgs> WindowCreated;
+        //event TypedEventHandler<PrismApplicationBase, WindowCreatedEventArgs> WindowCreated;
     }
 }

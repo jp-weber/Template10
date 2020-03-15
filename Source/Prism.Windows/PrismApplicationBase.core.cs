@@ -1,25 +1,22 @@
 ﻿using Prism.Events;
 using Prism.Ioc;
 using Prism.Logging;
-using Prism.Navigation;
 using Prism.Mvvm;
 using System;
-using System.Linq;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
-using Prism.Services;
 using Windows.ApplicationModel.Activation;
-using Windows.Storage;
-using Prism.Modularity;
-using Windows.UI.Xaml.Controls;
+using Windows.ApplicationModel.Core;
+using Prism.Core.Services;
+using Windows.UI.Core.Preview;
 
 namespace Prism
 {
     public abstract partial class PrismApplicationBase
     {
-        public new static PrismApplicationBase Current => (PrismApplicationBase)Application.Current;
+        public static new PrismApplicationBase Current => (PrismApplicationBase)Application.Current;
         private static readonly SemaphoreSlim _startSemaphore = new SemaphoreSlim(1, 1);
         public const string NavigationServiceParameterName = "navigationService";
         private readonly bool _logStartingEvents = false;
@@ -28,38 +25,70 @@ namespace Prism
         {
             InternalInitialize();
             _logger.Log("[App.Constructor()]", Category.Info, Priority.None);
-            (this as IPrismApplicationEvents).WindowCreated += (s, e) =>
+
+            CoreApplication.Exiting += (s, e) =>
             {
-                Container.SetupForCurrentView(e.Window.CoreWindow);
+                var stopArgs = new StopArgs(StopKind.CoreApplicationExiting) { CoreApplicationEventArgs = e };
+                OnStop(stopArgs);
+                OnStopAsync(stopArgs).RunSynchronously();
             };
+
+            WindowService.WindowCreatedCallBacks.Add(Guid.Empty, args =>
+            {
+                WindowService.WindowCreatedCallBacks.Remove(Guid.Empty);
+
+                args.Window.Closed += (s, e) =>
+                {
+                    OnStop(new StopArgs(StopKind.CoreWindowClosed) { CoreWindowEventArgs = e });
+                    OnStopAsync(new StopArgs(StopKind.CoreWindowClosed) { CoreWindowEventArgs = e }).RunSynchronously();
+                };
+
+                SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += async (s, e) =>
+                {
+                    var deferral = e.GetDeferral();
+                    try
+                    {
+                        OnStop(new StopArgs(StopKind.CloseRequested) { CloseRequestedPreviewEventArgs = e });
+                        await OnStopAsync(new StopArgs(StopKind.CloseRequested) { CloseRequestedPreviewEventArgs = e });
+                    }
+                    finally
+                    {
+                        deferral.Complete();
+                    }
+                };
+            });
+
             base.Suspending += async (s, e) =>
             {
-                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("Suspend_Data"))
-                {
-                    ApplicationData.Current.LocalSettings.Values.Remove("Suspend_Data");
-                }
-                ApplicationData.Current.LocalSettings.Values.Add("Suspend_Data", DateTime.Now.ToString());
+                SuspensionUtilities.SetSuspendDate(DateTime.Now);
                 var deferral = e.SuspendingOperation.GetDeferral();
                 try
                 {
-                    OnSuspending();
-                    await OnSuspendingAsync();
+                    var stopArgs = new StopArgs(StopKind.Suspending) { SuspendingEventArgs = e };
+                    OnStop(stopArgs);
+                    await OnStopAsync(stopArgs);
                 }
                 finally
                 {
                     deferral.Complete();
                 }
             };
+
             base.Resuming += async (s, e) =>
             {
-                await InternalStartAsync(new StartArgs(ResumeArgs.Create(ApplicationExecutionState.Suspended), StartKinds.Resume));
+                var resumeArgs = new ResumeArgs
+                {
+                    PreviousExecutionState = ApplicationExecutionState.Suspended,
+                };
+                var startArgs = new StartArgs(resumeArgs, StartKinds.ResumeInMemory);
+                await InternalStartAsync(startArgs);
             };
         }
 
+        public Func<SplashScreen, UIElement> ExtendedSplashScreenFactory { get; set; }
+
         private IContainerExtension _containerExtension;
         public IContainerProvider Container => _containerExtension;
-
-        protected INavigationService NavigationService { get; private set; }
 
         private void InternalInitialize()
         {
@@ -71,10 +100,15 @@ namespace Prism
 
             // dependecy injection
             _containerExtension = CreateContainerExtension();
-            RegisterRequiredTypes(_containerExtension);
+            if (_containerExtension is IContainerRegistry registry)
+            {
+                registry.RegisterSingleton<ILoggerFacade, DebugLogger>();
+                registry.RegisterSingleton<IEventAggregator, EventAggregator>();
+                RegisterInternalTypes(registry);
+            }
 
             Debug.WriteLine("[App.RegisterTypes()]");
-            RegisterTypes(_containerExtension);
+            RegisterTypes(_containerExtension as IContainerRegistry);
 
             Debug.WriteLine("Dependency container has just been finalized.");
             _containerExtension.FinalizeExtension();
@@ -84,31 +118,28 @@ namespace Prism
 
             // finalize the application
             ConfigureViewModelLocator();
-
-            ConfigureModuleCatalog(Container.Resolve<IModuleCatalog>());
-            InitializeModules();
         }
 
-        static int _initialized = 0;
+        private static int _initialized = 0;
         private ILoggerFacade _logger;
 
-        private void CallOnInitializedOnce()
+        private void CallOnInitializedOnlyOnce()
         {
             // don't forget there is no logger yet
             if (_logStartingEvents)
             {
-                _logger.Log($"{nameof(PrismApplicationBase)}.{nameof(CallOnInitializedOnce)}", Category.Info, Priority.None);
+                _logger.Log($"{nameof(PrismApplicationBase)}.{nameof(CallOnInitializedOnlyOnce)}", Category.Info, Priority.None);
             }
 
             // once and only once, ever
             if (Interlocked.Increment(ref _initialized) == 1)
             {
-                NavigationService = Container.CreateNavigationService(SupportedNavigationGestures());
-
                 _logger.Log("[App.OnInitialize()]", Category.Info, Priority.None);
                 OnInitialized();
             }
         }
+
+        private static int _started = 0;
 
         private async Task InternalStartAsync(StartArgs startArgs)
         {
@@ -118,121 +149,92 @@ namespace Prism
                 _logger.Log($"{nameof(PrismApplicationBase)}.{nameof(InternalStartAsync)}({startArgs})", Category.Info, Priority.None);
             }
 
+            // sometimes activation is rased through the base.onlaunch. We'll fix that.
+            if (Interlocked.Increment(ref _started) > 1 && startArgs.StartKind == StartKinds.Launch)
+            {
+                startArgs.StartKind = StartKinds.Activate;
+            }
+
+            SetupExtendedSplashScreen();
+
             try
             {
-                CallOnInitializedOnce();
-                TestResuming(startArgs);
+                CallOnInitializedOnlyOnce();
+
+                if (SuspensionUtilities.IsResuming(startArgs, out var resumeArgs))
+                {
+                    startArgs.StartKind = StartKinds.ResumeFromTerminate;
+                    startArgs.Arguments = resumeArgs;
+                }
+                SuspensionUtilities.ClearSuspendDate();
+
                 _logger.Log($"[App.OnStart(startKind:{startArgs.StartKind}, startCause:{startArgs.StartCause})]", Category.Info, Priority.None);
                 OnStart(startArgs);
+
                 _logger.Log($"[App.OnStartAsync(startKind:{startArgs.StartKind}, startCause:{startArgs.StartCause})]", Category.Info, Priority.None);
                 await OnStartAsync(startArgs);
-                Window.Current.Activate();
-            }
-            catch (Exception ex)
-            {
-                _logger.Log($"ERROR {ex.Message}", Category.Exception, Priority.High);
-                Debugger.Break();
             }
             finally
             {
                 _startSemaphore.Release();
             }
-        }
 
-        private static void TestResuming(StartArgs startArgs)
-        {
-            if (startArgs.Arguments is ILaunchActivatedEventArgs e
-                && e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+            void SetupExtendedSplashScreen()
             {
-                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("Suspend_Data"))
+                if (startArgs.StartKind == StartKinds.Launch
+                    && startArgs.Arguments is IActivatedEventArgs act
+                    && Window.Current.Content is null
+                    && !(ExtendedSplashScreenFactory is null))
                 {
-                    ApplicationData.Current.LocalSettings.Values.Remove("Suspend_Data");
-                    startArgs.Arguments = ResumeArgs.Create(ApplicationExecutionState.Terminated);
-                    startArgs.StartKind = StartKinds.Resume;
+                    try
+                    {
+                        Window.Current.Content = ExtendedSplashScreenFactory(act.SplashScreen);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Error during {nameof(ExtendedSplashScreenFactory)}.", ex);
+                    }
                 }
             }
-        }
-
-        private static DateTime? SuspendData
-        {
-            get
-            {
-                if (ApplicationData.Current.LocalSettings.Values.TryGetValue("Suspend_Data", out var value)
-                    && value != null
-                    && DateTime.TryParse(value.ToString(), out var date))
-                {
-                    return date;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            set => ApplicationData.Current.LocalSettings.Values["Suspend_Data"] = value;
         }
 
         #region overrides
 
-        protected virtual void OnSuspending() { /* empty */ }
+        public virtual void OnStop(IStopArgs stopArgs) { /* empty */ }
 
-        protected virtual Task OnSuspendingAsync() => Task.CompletedTask;
-
-        protected abstract void RegisterTypes(IContainerRegistry containerRegistry);
-
-        protected virtual void OnInitialized()
+        public virtual Task OnStopAsync(IStopArgs stopArgs)
         {
-            NavigationService.SetAsWindowContent(Window.Current, true);
+            return Task.CompletedTask;
         }
 
-        protected virtual void OnStart(StartArgs args) {  /* empty */ }
+        public abstract void RegisterTypes(IContainerRegistry container);
 
-        protected virtual Task OnStartAsync(StartArgs args) => Task.CompletedTask;
+        public virtual void OnInitialized() { /* empty */ }
 
-        protected virtual Gesture[] SupportedNavigationGestures() => new Gesture[] { Gesture.Back, Gesture.Forward, Gesture.Refresh };
+        public virtual void OnStart(IStartArgs args) {  /* empty */ }
 
-        protected virtual void ConfigureViewModelLocator()
+        public virtual Task OnStartAsync(IStartArgs args)
         {
-            ViewModelLocationProvider.SetDefaultViewModelFactory((view, viewModelType) =>
+            return Task.CompletedTask;
+        }
+
+        public virtual void ConfigureViewModelLocator()
+        {
+            // this is a testability method
+            ViewModelLocationProvider.SetDefaultViewModelFactory((view, type) =>
             {
-                INavigationService navigationService = null;
-
-                if (view is Page page && page.Frame != null)
-                {
-                    navigationService = Container.CreateNavigationService(page.Frame, SupportedNavigationGestures());
-                }
-
-                return Container.Resolve(viewModelType, (typeof(INavigationService), navigationService));
+                return _containerExtension.ResolveViewModelForView(view, type);
             });
         }
 
-        protected virtual void ConfigureModuleCatalog(IModuleCatalog moduleCatalog) { /* empty */ }
+        public abstract IContainerExtension CreateContainerExtension();
 
-        protected virtual void InitializeModules()
+        protected virtual void RegisterInternalTypes(IContainerRegistry containerRegistry)
         {
-            if (Container.Resolve<IModuleCatalog>().Modules.Any())
-            {
-                IModuleManager manager = Container.Resolve<IModuleManager>();
-                manager.Run();
-            }
+            // don't forget there is no logger yet
+            Debug.WriteLine($"{nameof(PrismApplicationBase)}.{nameof(RegisterInternalTypes)}()");
         }
 
-        protected abstract IContainerExtension CreateContainerExtension();
-
-        protected virtual void RegisterRequiredTypes(IContainerRegistry containerRegistry)
-        {
-            containerRegistry.Register<IPlatformNavigationService, NavigationService>(NavigationServiceParameterName);
-            containerRegistry.Register<IGestureService, GestureService>();
-            containerRegistry.Register<IFrameFacade, FrameFacade>();
-
-            // standard prism services
-            containerRegistry.RegisterInstance<IContainerExtension>(_containerExtension);
-            containerRegistry.RegisterSingleton<ILoggerFacade, DebugLogger>();
-            containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
-            containerRegistry.RegisterSingleton<IModuleCatalog, ModuleCatalog>();
-            containerRegistry.RegisterSingleton<IModuleManager, ModuleManager>();
-            containerRegistry.RegisterSingleton<IModuleInitializer, ModuleInitializer>();
-        }
-
-#endregion
+        #endregion
     }
 }

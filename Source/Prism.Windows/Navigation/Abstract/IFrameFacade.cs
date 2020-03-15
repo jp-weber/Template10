@@ -2,10 +2,12 @@
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Animation;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
     public interface IFrameFacade
     {
+        string Id { get; set; }
+
         bool CanGoBack();
         event EventHandler CanGoBackChanged;
         Task<INavigationResult> GoBackAsync(INavigationParameters parameters, NavigationTransitionInfo infoOverride);

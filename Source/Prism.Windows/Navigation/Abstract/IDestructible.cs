@@ -1,4 +1,4 @@
-﻿namespace Prism.Navigation
+﻿namespace Template10.Navigation
 {
     public interface IDestructible
     {

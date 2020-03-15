@@ -1,4 +1,4 @@
-﻿namespace Prism.Navigation
+﻿namespace Template10.Navigation
 {
     /// <summary>
     /// Provides a way for ViewModels involved in navigation to be notified of navigation activities.

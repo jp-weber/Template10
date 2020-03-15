@@ -4,7 +4,7 @@ using System.Linq;
 using Windows.Foundation;
 using Windows.UI.Xaml.Navigation;
 
-namespace Prism.Navigation
+namespace Template10.Navigation
 {
     public static class NavigationEventArgsExtensions
     {

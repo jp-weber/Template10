@@ -1,5 +1,6 @@
 ﻿using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
+using Prism.Core.Services;
 
 namespace Prism
 {
@@ -18,7 +19,7 @@ namespace Prism
         protected override void OnWindowCreated(WindowCreatedEventArgs args)
         {
             base.OnWindowCreated(args);
-            _windowCreated?.Invoke(this, args);
+            WindowService.ForwardWindowCreated(args);
         }
     }
 }
