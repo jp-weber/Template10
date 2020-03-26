@@ -27,14 +27,18 @@ namespace Template10.Services.Settings
 
         public bool EnableCompression { get; set; } = false;
 
-        public T Read<T>(string key)
+        public (bool successful, T result) Read<T>(string key)
         {
-            var result = _adapter.ReadString(key);
+            var resultTuple = _adapter.ReadString(key);
+            if (!resultTuple.successful)
+            {
+                return (false, default(T));
+            }
             if (EnableCompression)
             {
-                result = _compressionService.Unzip(result);
+                resultTuple.Item2 = _compressionService.Unzip(resultTuple.Item2);
             }
-            return _serializationService.Deserialize<T>(result);
+            return (true,_serializationService.Deserialize<T>(resultTuple.Item2));
         }
 
         public T SafeRead<T>(string key, T otherwise)
@@ -66,8 +70,17 @@ namespace Template10.Services.Settings
         {
             try
             {
-                value = Read<T>(key);
-                return true;
+                var resultTuple = Read<T>(key);
+                if (resultTuple.successful)
+                {
+                    value = resultTuple.result;
+                    return true;
+                }
+                else
+                {
+                    value = default(T);
+                    return false;
+                }
             }
             catch (System.Exception)
             {
@@ -100,14 +113,14 @@ namespace Template10.Services.Settings
 
         public string ReadString(string key)
         {
-            var result = _adapter.ReadString(key);
+            var resultTuple = _adapter.ReadString(key);
             if (EnableCompression)
             {
-                return _compressionService.Unzip(result);
+                return _compressionService.Unzip(resultTuple.result);
             }
             else
             {
-                return result;
+                return resultTuple.result;
             }
         }
 

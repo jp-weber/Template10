@@ -30,8 +30,10 @@ namespace Template10.Services.Settings
             _helper = fileService;
         }
 
-        public string ReadString(string key)
-            => _helper.ReadStringAsync(key, StorageStrategies.Roaming).Result;
+        public (bool successful, string result) ReadString(string key)
+        {
+            return (true, _helper.ReadStringAsync(key, StorageStrategies.Roaming).Result);
+        }
 
         public void WriteString(string key, string value)
         {

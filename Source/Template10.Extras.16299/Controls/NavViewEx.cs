@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Prism.Navigation;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
-using System.Collections.ObjectModel;
 using win = Windows;
-using System.Threading;
 using Prism.Services;
 using Windows.UI.Xaml.Controls;
 using NavigationView = Microsoft.UI.Xaml.Controls.NavigationView;
 using NavigationViewItem = Microsoft.UI.Xaml.Controls.NavigationViewItem;
-using Prism;
 using Template10.Navigation;
+using System.Threading.Tasks;
 
 namespace Template10.Controls
 {
@@ -35,7 +32,7 @@ namespace Template10.Controls
             Content = _frame = new Frame();
             _dispatcher = _frame.Dispatcher;
 
-            _frame.Navigated += (s, e) =>
+            _frame.Navigated += async (s, e) =>
             {
                 if (TryFindItem(e.SourcePageType, e.Parameter, out var item))
                 {
@@ -45,13 +42,25 @@ namespace Template10.Controls
                         return;
                     }
                 }
+                if (IsPaneOpen && (PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftCompact ||
+                PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftMinimal))
+                {
+                    await Task.Delay(450);
+                    IsPaneOpen = false;
+                }
             };
 
             NavigationService = NavigationFactory.Create(_frame).AttachGestures(Window.Current, Gesture.Back, Gesture.Forward, Gesture.Refresh);
 
-            ItemInvoked += (s, e) =>
+            ItemInvoked += async (s, e) =>
             {
                 SelectedItem = (e.IsSettingsInvoked) ? SettingsItem : Find(e.InvokedItemContainer as NavigationViewItem);
+                if (IsPaneOpen && (PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftCompact ||
+                PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftMinimal))
+                {
+                    await Task.Delay(450);
+                    IsPaneOpen = false;
+                }
             };
         }
         public string SettingsNavigationUri { get; set; }

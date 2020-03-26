@@ -4,7 +4,7 @@
     {
         bool EnableCompression { get; set; }
 
-        T Read<T>(string key);
+        (bool successful, T result) Read<T>(string key);
         string ReadString(string key);
         T SafeRead<T>(string key, T otherwise);
         bool TryRead<T>(string key, out T value);
