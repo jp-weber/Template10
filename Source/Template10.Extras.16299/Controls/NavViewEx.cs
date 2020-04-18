@@ -32,7 +32,7 @@ namespace Template10.Controls
             Content = _frame = new Frame();
             _dispatcher = _frame.Dispatcher;
 
-            _frame.Navigated += async (s, e) =>
+            _frame.Navigated += (s, e) =>
             {
                 if (TryFindItem(e.SourcePageType, e.Parameter, out var item))
                 {
@@ -45,20 +45,20 @@ namespace Template10.Controls
                 if (IsPaneOpen && (PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftCompact ||
                 PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftMinimal))
                 {
-                    await Task.Delay(450);
+                    //await Task.Delay(450);
                     IsPaneOpen = false;
                 }
             };
 
             NavigationService = NavigationFactory.Create(_frame).AttachGestures(Window.Current, Gesture.Back, Gesture.Forward, Gesture.Refresh);
 
-            ItemInvoked += async (s, e) =>
+            ItemInvoked += (s, e) =>
             {
                 SelectedItem = (e.IsSettingsInvoked) ? SettingsItem : Find(e.InvokedItemContainer as NavigationViewItem);
                 if (IsPaneOpen && (PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftCompact ||
                 PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftMinimal))
                 {
-                    await Task.Delay(450);
+                    //await Task.Delay(450);
                     IsPaneOpen = false;
                 }
             };
@@ -197,7 +197,6 @@ namespace Template10.Controls
         private NavigationViewItem Find(NavigationViewItem item)
         {
             return this.MenuItems.OfType<NavigationViewItem>().SingleOrDefault(x => x.Equals(item));
-            //return this.MenuItems.OfType<NavigationViewItem>().SingleOrDefault(x => x.Content.Equals(content));
         }
     }
 }
