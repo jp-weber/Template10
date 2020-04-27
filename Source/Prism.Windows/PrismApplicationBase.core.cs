@@ -30,7 +30,7 @@ namespace Prism
             {
                 var stopArgs = new StopArgs(StopKind.CoreApplicationExiting) { CoreApplicationEventArgs = e };
                 OnStop(stopArgs);
-                OnStopAsync(stopArgs).RunSynchronously();
+                OnStopAsync(stopArgs);
             };
 
             WindowService.WindowCreatedCallBacks.Add(Guid.Empty, args =>

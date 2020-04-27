@@ -120,7 +120,7 @@
       <Version>7.2.0.1422</Version>
     </PackageReference>
     <PackageReference Include="Unity.Container">
-      <Version>5.11.6</Version>
+      <Version>5.11.7</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
