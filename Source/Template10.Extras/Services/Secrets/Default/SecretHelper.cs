@@ -54,6 +54,20 @@ namespace Template10.Services.Secrets
             }
         }
 
+        public void RemoveSecret(string key)
+        {
+            RemoveSecret(GetType().ToString(), key);
+        }
+
+        public void RemoveSecret(string container, string key)
+        {
+            if (_vault.RetrieveAll().Any(x => x.Resource == container && x.UserName == key))
+            {
+                var credential = _vault.Retrieve(container, key);
+                _vault.Remove(credential);
+            }
+        }
+
         public bool IsSecretExistsForKey(string key, bool RemoveIfExists = false)
         {
             var container = GetType().ToString();

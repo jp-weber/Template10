@@ -227,7 +227,11 @@ namespace Prism
             });
         }
 
-        public abstract IContainerExtension CreateContainerExtension();
+        /// <summary>
+        /// Creates the container used by Prism.
+        /// </summary>
+        /// <returns>The container</returns>
+        protected abstract IContainerExtension CreateContainerExtension();
 
         protected virtual void RegisterInternalTypes(IContainerRegistry containerRegistry)
         {

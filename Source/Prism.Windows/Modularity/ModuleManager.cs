@@ -20,6 +20,7 @@ namespace Prism.Modularity
         /// Raised when a module is loaded or fails to load.
         /// </summary>
         public event EventHandler<LoadModuleCompletedEventArgs> LoadModuleCompleted;
+        public event EventHandler<ModuleDownloadProgressChangedEventArgs> ModuleDownloadProgressChanged;
 
         /// <summary>
         /// The module initializer.
