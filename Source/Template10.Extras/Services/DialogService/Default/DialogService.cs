@@ -8,15 +8,27 @@ namespace Template10.Services.Dialog
 {
     public class DialogService : IDialogService
     {
+        private static CancellationTokenSource _tokenSource;
         public async Task<MessageBoxResult> AlertAsync(string content, IDialogResourceResolver resolver = null)
             => await AlertAsync(string.Empty, content, resolver);
 
         public async Task<MessageBoxResult> AlertAsync(string title, string content, IDialogResourceResolver resolver = null)
             => await new MessageBoxEx(title, content, MessageBoxType.Ok, resolver).ShowAsync();
 
-        public Task<bool> IsDialogRunning()
+        public async void CancelDialogs()
         {
-            return Task.FromResult(DialogManager.OneAtATimeAsyncSemaphore.CurrentCount < 1 ? true: false);
+            if (await IsDialogRunning())
+            {
+                if (_tokenSource != null)
+                {
+                    _tokenSource.Cancel();
+                }
+            }
+        }
+
+        public async Task<bool> IsDialogRunning()
+        {
+            return await DialogManager.IsDialogRunning();
         }
 
         public async Task<MessageBoxResult> PromptAsync(string content, MessageBoxType type = MessageBoxType.YesNo, IDialogResourceResolver resolver = null)
@@ -33,7 +45,20 @@ namespace Template10.Services.Dialog
 
         public async Task<ContentDialogResult> ShowAsync(ContentDialog dialog, TimeSpan? timeout = null, CancellationToken? token = null)
         {
-            return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(), timeout, token);
+            //TODO token cannot cancel the dialog!
+            if (_tokenSource is null)
+            {
+                _tokenSource = new CancellationTokenSource();
+            }
+            if (token is null)
+            {
+                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(), timeout, _tokenSource.Token);
+            }
+            else
+            {
+                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(), timeout, token);
+            }
+            
         }
 
         public async Task<IUICommand> ShowAsync(MessageDialog dialog, TimeSpan? timeout = null, CancellationToken? token = null)

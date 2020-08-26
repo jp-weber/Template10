@@ -112,6 +112,11 @@
     <Compile Include="IPrismApplicationEvents.cs" />
     <Compile Include="IResumeArgs.cs" />
     <Compile Include="IStartArgs.cs" />
+    <Compile Include="Logging\Category.cs" />
+    <Compile Include="Logging\DebugLogger.cs" />
+    <Compile Include="Logging\EmptyLogger.cs" />
+    <Compile Include="Logging\ILoggerFacade.cs" />
+    <Compile Include="Logging\Priority.cs" />
     <Compile Include="Modularity\IModuleCatalogExtensions.cs" />
     <Compile Include="Modularity\ModuleCatalog.cs" />
     <Compile Include="Modularity\ModuleInfo.cs" />
@@ -183,7 +188,7 @@
       <Version>6.2.10</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>8.0.0.1740-pre</Version>
+      <Version>8.0.0.1850-pre</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>

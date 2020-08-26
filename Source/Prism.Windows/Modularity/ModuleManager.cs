@@ -27,6 +27,12 @@ namespace Prism.Modularity
         /// </summary>
         protected IModuleInitializer ModuleInitializer { get; }
 
+
+        /// <summary>
+        /// Gets all the <see cref="IModuleInfo"/> classes that are in the <see cref="IModuleCatalog"/>.
+        /// </summary>
+        public IEnumerable<IModuleInfo> Modules => ModuleCatalog.Modules;
+
         /// <summary>
         /// Initializes an instance of the <see cref="ModuleManager"/> class.
         /// </summary>
