@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Popups;
@@ -22,6 +23,7 @@ namespace Template10.Services.Dialog
                 if (_tokenSource != null)
                 {
                     _tokenSource.Cancel();
+                    _tokenSource = new CancellationTokenSource();
                 }
             }
         }
@@ -45,20 +47,20 @@ namespace Template10.Services.Dialog
 
         public async Task<ContentDialogResult> ShowAsync(ContentDialog dialog, TimeSpan? timeout = null, CancellationToken? token = null)
         {
-            //TODO token cannot cancel the dialog!
+            var tk = token ?? new CancellationToken(false);
             if (_tokenSource is null)
             {
                 _tokenSource = new CancellationTokenSource();
             }
             if (token is null)
             {
-                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(), timeout, _tokenSource.Token);
+                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(_tokenSource.Token), timeout, _tokenSource.Token);
+
             }
             else
             {
-                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(), timeout, token);
+                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(_tokenSource.Token), timeout, tk);
             }
-            
         }
 
         public async Task<IUICommand> ShowAsync(MessageDialog dialog, TimeSpan? timeout = null, CancellationToken? token = null)

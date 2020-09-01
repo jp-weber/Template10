@@ -24,23 +24,5 @@ namespace Template10.Services.Dialog
             try { return await show(); }
             finally { _oneAtATimeAsync.Release(); }
         }
-
-        internal static async Task<T> OneAtATimeAsync<T>(Func<Task<T>> show, TimeSpan? timeout, CancellationToken token)
-        {
-            var to = timeout ?? TimeSpan.FromHours(1);
-            if (!await _oneAtATimeAsync.WaitAsync(to, token))
-            {
-                throw new Exception($"{nameof(DialogManager)}.{nameof(OneAtATimeAsync)} has timed out.");
-            }
-            try { return await show().WaitAsync(token); }
-            finally { _oneAtATimeAsync.Release(); }
-        }
-
-        public static async Task<T> WaitAsync<T>(this Task<T> task, CancellationToken token)
-        {
-            var tcs = new TaskCompletionSource<T>();
-            using (token.Register(() => tcs.TrySetCanceled(token), useSynchronizationContext: false))
-                return await await Task.WhenAny(task, tcs.Task).ConfigureAwait(false);
-        }
     }
 }
