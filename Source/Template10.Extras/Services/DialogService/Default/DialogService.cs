@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Popups;
@@ -16,6 +15,9 @@ namespace Template10.Services.Dialog
         public async Task<MessageBoxResult> AlertAsync(string title, string content, IDialogResourceResolver resolver = null)
             => await new MessageBoxEx(title, content, MessageBoxType.Ok, resolver).ShowAsync();
 
+        /// <summary>
+        /// closes all dialogs where no user defined token was passed
+        /// </summary>
         public async void CancelDialogs()
         {
             if (await IsDialogRunning())
@@ -28,6 +30,10 @@ namespace Template10.Services.Dialog
             }
         }
 
+        /// <summary>
+        /// calls up whether dialogs are currently active through the service
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> IsDialogRunning()
         {
             return await DialogManager.IsDialogRunning();
@@ -47,20 +53,12 @@ namespace Template10.Services.Dialog
 
         public async Task<ContentDialogResult> ShowAsync(ContentDialog dialog, TimeSpan? timeout = null, CancellationToken? token = null)
         {
-            var tk = token ?? new CancellationToken(false);
             if (_tokenSource is null)
             {
                 _tokenSource = new CancellationTokenSource();
             }
-            if (token is null)
-            {
-                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(_tokenSource.Token), timeout, _tokenSource.Token);
-
-            }
-            else
-            {
-                return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(_tokenSource.Token), timeout, tk);
-            }
+            var tk = token ?? _tokenSource.Token;
+            return await DialogManager.OneAtATimeAsync(async () => await dialog.ShowAsync(tk), timeout, tk);
         }
 
         public async Task<IUICommand> ShowAsync(MessageDialog dialog, TimeSpan? timeout = null, CancellationToken? token = null)

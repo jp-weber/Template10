@@ -61,17 +61,21 @@ namespace Template10.Services.Secrets
 
         public void RemoveSecret(string container, string key)
         {
-            if (_vault.RetrieveAll().Any(x => x.Resource == container && x.UserName == key))
-            {
-                var credential = _vault.Retrieve(container, key);
-                _vault.Remove(credential);
-            }
+            IsSecretExistsForKey(container, key, true);
         }
 
-        public bool IsSecretExistsForKey(string key, bool RemoveIfExists = false)
+        public bool IsSecretExistsForKey(string key)
         {
-            var container = GetType().ToString();
+            return IsSecretExistsForKey(GetType().ToString(), key, false);
+        }
 
+        public bool IsSecretExistsForKey(string container, string key)
+        {
+            return IsSecretExistsForKey(container, key, false);
+        }
+
+        private bool IsSecretExistsForKey(string container, string key, bool RemoveIfExists)
+        {
             if (_vault.RetrieveAll().Any(x => x.Resource == container && x.UserName == key))
             {
                 var credential = _vault.Retrieve(container, key);
@@ -79,7 +83,10 @@ namespace Template10.Services.Secrets
 
                 if (credential.Password.Length > 0)
                 {
-                    if (RemoveIfExists) _vault.Remove(credential);
+                    if (RemoveIfExists)
+                    {
+                        _vault.Remove(credential);
+                    }
                     return true;
                 }
                 else
