@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Prism.Ioc;
@@ -46,7 +47,7 @@ namespace Prism.Unity
             Instance.RegisterInstance(currentContainer, this);
             Instance.RegisterFactory(typeof(IContainerExtension), c => c.Resolve<UnityContainerExtension>(currentContainer));
             Instance.RegisterFactory(typeof(IContainerProvider), c => c.Resolve<UnityContainerExtension>(currentContainer));
-            //ExceptionExtensions.RegisterFrameworkExceptionType(typeof(ResolutionFailedException));
+            ExceptionExtensions.RegisterFrameworkExceptionType(typeof(ResolutionFailedException));
         }
 #endif
 
@@ -144,7 +145,7 @@ namespace Prism.Unity
         public IContainerRegistry RegisterManySingleton(Type type, params Type[] serviceTypes)
         {
             Instance.RegisterSingleton(type);
-            return RegisterManyInternal(type, serviceTypes);
+            return this;
         }
 
         private IContainerRegistry RegisterManyInternal(Type implementingType, Type[] serviceTypes)
@@ -221,7 +222,7 @@ namespace Prism.Unity
         public IContainerRegistry RegisterMany(Type type, params Type[] serviceTypes)
         {
             Instance.RegisterType(type);
-            return RegisterManyInternal(type, serviceTypes);
+            return this;
         }
 
         /// <summary>
@@ -289,6 +290,13 @@ namespace Prism.Unity
             {
                 var c = _currentScope?.Container ?? Instance;
                 var overrides = parameters.Select(p => new DependencyOverride(p.Type, p.Instance)).ToArray();
+
+                if (typeof(IEnumerable).IsAssignableFrom(type) && type.GetGenericArguments().Length > 0)
+                {
+                    type = type.GetGenericArguments()[0];
+                    return c.ResolveAll(type, overrides);
+                }
+
                 return c.Resolve(type, overrides);
             }
             catch (Exception ex)

@@ -126,7 +126,6 @@
     <Compile Include="Mvvm\ViewModelLocator.cs" />
     <Compile Include="Navigation\Abstract\IConfirmNavigation.cs" />
     <Compile Include="Navigation\Abstract\IConfirmNavigationAsync.cs" />
-    <Compile Include="Navigation\Abstract\IDestructible.cs" />
     <Compile Include="Navigation\Abstract\IFrameFacade.cs" />
     <Compile Include="Navigation\Abstract\IFrameFacade2.cs" />
     <Compile Include="Navigation\Abstract\INavigatedAware.cs" />
