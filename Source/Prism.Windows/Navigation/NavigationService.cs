@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Prism.Common;
 using Prism.Ioc;
 using Prism.Logging;
 using Windows.UI.Xaml.Controls;
@@ -108,19 +109,25 @@ namespace Prism.Navigation
         public async Task<INavigationResult> NavigateAsync(string path)
             => await NavigateAsync(
                 uri: new Uri(path, UriKind.RelativeOrAbsolute),
-                parameter: default,
+                parameters: default(INavigationParameters),
                 infoOverride: default);
 
         public async Task<INavigationResult> NavigateAsync(string path, INavigationParameters parameters)
             => await NavigateAsync(
                 uri: new Uri(path, UriKind.RelativeOrAbsolute),
-                parameter: parameters,
+                parameters: parameters,
+                infoOverride: default);
+
+        public async Task<INavigationResult> NavigateAsync(string path, params (string Key, object Value)[] parameters)
+            => await NavigateAsync(
+                uri: new Uri(path, UriKind.RelativeOrAbsolute),
+                parameters: parameters,
                 infoOverride: default);
 
         public async Task<INavigationResult> NavigateAsync(string path, INavigationParameters parameter, NavigationTransitionInfo infoOverride)
             => await NavigateAsync(
                 uri: new Uri(path, UriKind.RelativeOrAbsolute),
-                parameter: parameter,
+                parameters: parameter,
                 infoOverride: infoOverride);
         #endregion
 
@@ -129,24 +136,54 @@ namespace Prism.Navigation
         public async Task<INavigationResult> NavigateAsync(Uri uri)
             => await NavigateAsync(
                 uri: uri,
-                parameter: default,
+                parameters: default(INavigationParameters),
                 infoOverride: default);
 
         public async Task<INavigationResult> NavigateAsync(Uri uri, INavigationParameters parameters)
             => await NavigateAsync(
                 uri: uri,
-                parameter: parameters,
+                parameters: parameters,
                 infoOverride: default);
 
-        public async Task<INavigationResult> NavigateAsync(Uri uri, INavigationParameters parameter, NavigationTransitionInfo infoOverride)
+        /// <summary>
+        /// Initiates navigation to the target specified by the <paramref name="uri"/>.
+        /// </summary>
+        /// <param name="uri">The Uri to navigate to</param>
+        /// <param name="parameters">The navigation parameters</param>
+        /// <param name="infoOverride">The transition info</param>
+        /// <returns><see cref="INavigationResult"/> indicating whether the request was successful or if there was an encountered <see cref="Exception"/>.</returns>
+        /// <remarks>Navigation parameters can be provided in the Uri and by using the <paramref name="parameters"/>.</remarks>
+        /// <example>
+        /// NavigateAsync(new Uri("MainPage?id=3&amp;name=dan", UriKind.RelativeSource), ("person", person), ("foo", bar));
+        /// </example>
+        public async Task<INavigationResult> NavigateAsync(Uri uri, NavigationTransitionInfo infoOverride, params (string Key, object Value)[] parameters)
         {
-            _logger.Log($"{nameof(NavigationService)}.{nameof(NavigateAsync)}(uri:{uri} parameter:{parameter} info:{infoOverride})", Category.Info, Priority.None);
+            _logger.Log($"{nameof(NavigationService)}.{nameof(NavigateAsync)}(uri:{uri} parameter:{parameters} info:{infoOverride})", Category.Info, Priority.None);
+            return await NavigateAsync(
+                uri: uri,
+                parameters: GetNavigationParameters(parameters),
+                infoOverride: default);
+        }
+
+        public async Task<INavigationResult> NavigateAsync(Uri uri, INavigationParameters parameters, NavigationTransitionInfo infoOverride)
+        {
+            _logger.Log($"{nameof(NavigationService)}.{nameof(NavigateAsync)}(uri:{uri} parameter:{parameters} info:{infoOverride})", Category.Info, Priority.None);
 
             return await _frame.NavigateAsync(
                 uri: uri,
-                parameter: parameter,
+                parameter: parameters,
                 infoOverride: infoOverride);
         }
         #endregion
+
+        private static INavigationParameters GetNavigationParameters((string Key, object Value)[] parameters)
+        {
+            var navParams = new NavigationParameters();
+            foreach (var (Key, Value) in parameters)
+            {
+                navParams.Add(Key, Value);
+            }
+            return navParams;
+        }
     }
 }

@@ -52,7 +52,7 @@ namespace Prism.Common
 
         public static INavigationParameters GetSegmentParameters(string uriSegment, INavigationParameters parameters)
         {
-            var navParameters = UriParsingHelper.GetSegmentParameters(uriSegment);
+            var navParameters = GetSegmentParameters(uriSegment);
 
             if (parameters != null)
             {
