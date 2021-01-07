@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9BB18D4B-BCDD-43C9-A7C2-416D13DD39A6}</ProjectGuid>
+    <ProjectGuid>{648C8631-C97F-4B81-98FC-F4370317751A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Template10</RootNamespace>
-    <AssemblyName>Template10.Extras</AssemblyName>
+    <RootNamespace>Prism.Windows</RootNamespace>
+    <AssemblyName>Prism.Windows.Universal</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.19041.0</TargetPlatformVersion>
@@ -106,91 +106,86 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\Compression\Abstractions\CompressionMethods.enum.cs" />
-    <Compile Include="Services\Compression\Abstractions\ICompressionService.cs" />
-    <Compile Include="Services\Compression\Default\CompressionService.cs" />
-    <Compile Include="Services\DialogService\Abstractions\IDialogResourceResolver.cs" />
-    <Compile Include="Services\DialogService\Abstractions\IDialogService.cs" />
-    <Compile Include="Services\DialogService\Abstractions\IMessageBoxEx.cs" />
-    <Compile Include="Services\DialogService\Abstractions\MessageBoxResult.enum.cs" />
-    <Compile Include="Services\DialogService\Abstractions\MessageBoxType.enum.cs" />
-    <Compile Include="Services\DialogService\Abstractions\ResourceTypes.enum.cs" />
-    <Compile Include="Services\DialogService\Controls\MessageBoxEx.cs" />
-    <Compile Include="Services\DialogService\Default\DefaultDialogResourceResolver.cs" />
-    <Compile Include="Services\DialogService\Default\DialogManager.cs" />
-    <Compile Include="Services\DialogService\Default\DialogService.cs" />
-    <Compile Include="Services\DialogService\Default\Settings.cs" />
-    <Compile Include="Services\DialogService\Extensions\DialogExtensions.cs" />
-    <Compile Include="Services\File\Abstractions\IFileService.cs" />
-    <Compile Include="Services\File\Abstractions\StorageStrategies.enum.cs" />
-    <Compile Include="Services\File\Default\FileService.cs" />
-    <Compile Include="Services\Marketplace\Abstractions\IMarketplaceService.cs" />
-    <Compile Include="Services\Marketplace\Default\MarketplaceHelper.cs" />
-    <Compile Include="Services\Marketplace\Default\MarketplaceService.cs" />
-    <Compile Include="Services\Nag\Abstractions\INagService.cs" />
-    <Compile Include="Services\Nag\Abstractions\NagEx.cs" />
-    <Compile Include="Services\Nag\Abstractions\NagResponse.enum.cs" />
-    <Compile Include="Services\Nag\Abstractions\NagResponseInfo.cs" />
-    <Compile Include="Services\Nag\Abstractions\NagStorageStrategies.enum.cs" />
-    <Compile Include="Services\Nag\Default\NagService.cs" />
-    <Compile Include="Services\Nag\Default\NagServiceHelper.cs" />
-    <Compile Include="Services\Nag\Default\Settings.cs" />
-    <Compile Include="Services\Nag\Extensions\NagExtensions.cs" />
-    <Compile Include="Services\Network\Abstractions\AvailabilityChangedEventArgs.cs" />
-    <Compile Include="Services\Network\Abstractions\ConnectionTypes.enum.cs" />
-    <Compile Include="Services\Network\Abstractions\INetworkService.cs" />
-    <Compile Include="Services\Network\Default\NetworkAvailableHelper.cs" />
-    <Compile Include="Services\Network\Default\NetworkService.cs" />
-    <Compile Include="Services\Network\Messages\NetworkAvailabilityChangedMessage.cs" />
-    <Compile Include="Services\Resources\Abstractions\IResourceService.cs" />
-    <Compile Include="Services\Resources\Default\ResourceHelper.cs" />
-    <Compile Include="Services\Resources\Default\ResourceService.cs" />
-    <Compile Include="Services\Secrets\Abstractions\ISecretService.cs" />
-    <Compile Include="Services\Secrets\Abstractions\SecretServiceBase.cs" />
-    <Compile Include="Services\Secrets\Default\SecretHelper.cs" />
-    <Compile Include="Services\Secrets\Default\SecretService.cs" />
-    <Compile Include="Services\Serialization\Abstractions\ISerializationService.cs" />
-    <Compile Include="Services\Serialization\Default\NullSerializationService.cs" />
-    <Compile Include="Services\Settings\Abstractions\ISettingsAdapter.cs" />
-    <Compile Include="Services\Settings\Abstractions\ISettingsHelper.cs" />
-    <Compile Include="Services\Settings\Adapters\LocalFileSettingsAdapter.cs" />
-    <Compile Include="Services\Settings\Adapters\LocalSettingsAdapter.cs" />
-    <Compile Include="Services\Settings\Adapters\RoamingFileSettingsAdapter.cs" />
-    <Compile Include="Services\Settings\Adapters\RoamingSettingsAdapter.cs" />
-    <Compile Include="Services\Settings\Default\SettingsHelper.cs" />
-    <Compile Include="Services\Web\Abstractions\IWebApiAdapter.cs" />
-    <Compile Include="Services\Web\Abstractions\IWebApiService.cs" />
-    <Compile Include="Services\Web\Default\WebApiService.cs" />
-    <Compile Include="Services\Web\Default\WindowsHttpClientAdapter.cs" />
-    <Compile Include="Utilities\Extensions.cs" />
-    <Compile Include="Utilities\IEnumerableUtils.cs" />
-    <Compile Include="Xaml.Behaviors\ChangeCursorAction.cs" />
-    <Compile Include="Xaml.Behaviors\CloseFlyoutAction.cs" />
-    <Compile Include="Xaml.Behaviors\ConditionalAction.cs" />
-    <Compile Include="Xaml.Behaviors\EllipsisBehavior.cs" />
-    <Compile Include="Xaml.Behaviors\FocusAction.cs" />
-    <Compile Include="Xaml.Behaviors\KeyBehavior.cs" />
-    <Compile Include="Xaml.Behaviors\MessageDialogAction.cs" />
-    <Compile Include="Xaml.Behaviors\OpenFlyoutAction.cs" />
-    <Compile Include="Xaml.Behaviors\TextBoxEnterKeyBehavior.cs" />
-    <Compile Include="Xaml.Behaviors\TimeoutAction.cs" />
-    <Compile Include="Xaml.Converters\ChangeTypeConverter.cs" />
-    <Compile Include="Xaml.Converters\DateTimeOffsetConverter.cs" />
-    <Compile Include="Xaml.Converters\StringFormatConverter.cs" />
-    <Compile Include="Xaml.Converters\ValueWhenConverter.cs" />
-    <EmbeddedResource Include="Properties\Template10.Extras.rd.xml" />
+    <Compile Include="Ioc\ContainerProvider.cs" />
+    <Compile Include="Ioc\IContainerExtensionExtensions.cs" />
+    <Compile Include="Ioc\IContainerRegistryExtensions.cs" />
+    <Compile Include="IPrismApplicationEvents.cs" />
+    <Compile Include="IResumeArgs.cs" />
+    <Compile Include="IStartArgs.cs" />
+    <Compile Include="Modularity\IModuleCatalogExtensions.cs" />
+    <Compile Include="Modularity\ModuleCatalog.cs" />
+    <Compile Include="Modularity\ModuleInfo.cs" />
+    <Compile Include="Modularity\ModuleInitializer.cs" />
+    <Compile Include="Modularity\ModuleManager.cs" />
+    <Compile Include="Mvvm\ViewModelBase.cs" />
+    <Compile Include="Mvvm\ViewModelLocator.cs" />
+    <Compile Include="Navigation\Abstract\IConfirmNavigation.cs" />
+    <Compile Include="Navigation\Abstract\IConfirmNavigationAsync.cs" />
+    <Compile Include="Navigation\Abstract\IFrameFacade.cs" />
+    <Compile Include="Navigation\Abstract\IFrameFacade2.cs" />
+    <Compile Include="Navigation\Abstract\IInitialize.cs" />
+    <Compile Include="Navigation\Abstract\IInitializeAsync.cs" />
+    <Compile Include="Navigation\Abstract\INavigatedAware.cs" />
+    <Compile Include="Navigation\Abstract\INavigatingAware.cs" />
+    <Compile Include="Navigation\Abstract\INavigatingAwareAsync.cs" />
+    <Compile Include="Navigation\Abstract\INavigationAware.cs" />
+    <Compile Include="Navigation\Abstract\INavigationParameters.cs" />
+    <Compile Include="Navigation\Abstract\INavigationParametersExtensions.cs" />
+    <Compile Include="Navigation\Abstract\INavigationParametersInternal.cs" />
+    <Compile Include="Navigation\Abstract\INavigationPath.cs" />
+    <Compile Include="Navigation\Abstract\INavigationResult.cs" />
+    <Compile Include="Navigation\Abstract\INavigationServiceExtensions.cs" />
+    <Compile Include="Navigation\Abstract\INavigationService.cs" />
+    <Compile Include="Navigation\Abstract\INavigationService2.cs" />
+    <Compile Include="Navigation\FrameFacade.cs" />
+    <Compile Include="Navigation\FrameFacadeExtensions.cs" />
+    <Compile Include="Navigation\NavigationEventArgsExtensions.cs" />
+    <Compile Include="Navigation\NavigationFactory.cs" />
+    <Compile Include="Navigation\NavigationMode.cs" />
+    <Compile Include="Navigation\NavigationParameters.cs" />
+    <Compile Include="Navigation\NavigationParametersExtensions.cs" />
+    <Compile Include="Navigation\NavigationPath.cs" />
+    <Compile Include="Navigation\NavigationQueue.cs" />
+    <Compile Include="Navigation\NavigationService.cs" />
+    <Compile Include="Navigation\PageNavigationInfo.cs" />
+    <Compile Include="Navigation\PageNavigationRegistry.cs" />
+    <Compile Include="PrismApplicationBase.core.cs" />
+    <Compile Include="PrismApplicationBase.events.cs" />
+    <Compile Include="PrismApplicationBase.xaml.cs" />
+    <Compile Include="Properties\Resources.Designer.cs" />
+    <Compile Include="ResumeArgs.cs" />
+    <Compile Include="Services\Gesture\Gesture.cs" />
+    <Compile Include="Services\Gesture\GestureBlocker.cs" />
+    <Compile Include="Services\Gesture\GestureService.cs" />
+    <Compile Include="Services\Gesture\IGestureService.cs" />
+    <Compile Include="Services\Gesture\KeyDownEventArgs.cs" />
+    <Compile Include="Services\WindowService.cs" />
+    <Compile Include="StartArgs.cs" />
+    <Compile Include="StartCauses.cs" />
+    <Compile Include="StartKinds.cs" />
+    <Compile Include="SuspensionUtilities.cs" />
+    <Compile Include="Utilities\BindingUtilities.cs" />
+    <Compile Include="Utilities\XamlUtilities.cs" />
+    <EmbeddedResource Include="Properties\Prism.Windows.rd.xml" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.11</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
-      <Version>2.0.1</Version>
+    <PackageReference Include="System.ValueTuple">
+      <Version>4.5.0</Version>
     </PackageReference>
-    <PackageReference Include="Prism.Core">
-      <Version>8.0.0.1909</Version>
-    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Prism.Windows.Shared\Prism.Windows.Shared.csproj">
+      <Project>{34328bd8-8f6c-4619-8731-16eff8ca367e}</Project>
+      <Name>Prism.Windows.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
