@@ -112,6 +112,11 @@
     <Compile Include="IPrismApplicationEvents.cs" />
     <Compile Include="IResumeArgs.cs" />
     <Compile Include="IStartArgs.cs" />
+    <Compile Include="Logging\Category.cs" />
+    <Compile Include="Logging\DebugLogger.cs" />
+    <Compile Include="Logging\EmptyLogger.cs" />
+    <Compile Include="Logging\ILoggerFacade.cs" />
+    <Compile Include="Logging\Priority.cs" />
     <Compile Include="Modularity\IModuleCatalogExtensions.cs" />
     <Compile Include="Modularity\ModuleCatalog.cs" />
     <Compile Include="Modularity\ModuleInfo.cs" />
@@ -153,6 +158,11 @@
     <Compile Include="PrismApplicationBase.events.cs" />
     <Compile Include="PrismApplicationBase.xaml.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />
+    <Compile Include="Properties\Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ResumeArgs.cs" />
     <Compile Include="Services\Gesture\Gesture.cs" />
     <Compile Include="Services\Gesture\GestureBlocker.cs" />

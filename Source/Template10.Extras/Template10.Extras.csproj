@@ -192,6 +192,12 @@
       <Version>8.0.0.1909</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Prism.Windows.Universal\Prism.Windows.Universal.csproj">
+      <Project>{648c8631-c97f-4b81-98fc-f4370317751a}</Project>
+      <Name>Prism.Windows.Universal</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
